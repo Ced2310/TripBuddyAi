@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripBuddyAI — Parce que voyager ne devrait pas être un luxe</title>
+<style>
+  :root {
+    --sun: #F5A623;
+    --sky: #1A6B8A;
+    --deep: #0D2B38;
+    --coral: #E8634A;
+    --white: #FFFDF9;
+    --sand: #FDF6EC;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--white);
+    color: var(--deep);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top:0; left:0; right:0; z-index:100;
+    padding: 1rem 1.5rem;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(13,43,56,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .logo { font-size:1.3rem; font-weight:700; color:#fff; letter-spacing:-0.02em; }
+  .logo span { color: var(--sun); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: var(--deep);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 6rem 1.5rem 3rem;
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .hero::before {
+    content:'';
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 80%, rgba(245,166,35,0.18) 0%, transparent 55%),
+      radial-gradient(ellipse 50% 40% at 80% 20%, rgba(26,107,138,0.22) 0%, transparent 50%);
+  }
+  .hero-content { position:relative; z-index:2; max-width:700px; }
+
+  .eyebrow {
+    display:inline-block;
+    background: rgba(245,166,35,0.12);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius:30px; padding:0.4rem 1rem;
+    font-size:0.75rem; color:var(--sun);
+    letter-spacing:0.08em; text-transform:uppercase;
+    margin-bottom:1.8rem;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 7vw, 4.8rem);
+    font-weight:300; color:#fff;
+    line-height:1.1; letter-spacing:-0.03em;
+    margin-bottom:1.2rem;
+  }
+  h1 em { font-style:italic; color:var(--sun); }
+  .hero-sub {
+    font-size:1.05rem; color:rgba(255,255,255,0.5);
+    line-height:1.7; max-width:520px;
+    margin:0 auto 2rem;
+  }
+
+  /* CHAT DEMO */
+  .chat-demo {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius:20px; padding:1.3rem;
+    max-width:500px; margin:0 auto 2rem;
+    text-align:left;
+  }
+  .chat-header {
+    display:flex; align-items:center; gap:0.7rem;
+    padding-bottom:1rem; margin-bottom:1rem;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+  }
+  .avatar-circle {
+    width:36px; height:36px; border-radius:50%;
+    background:linear-gradient(135deg,var(--sun),var(--coral));
+    display:flex; align-items:center; justify-content:center;
+    font-size:1rem;
+  }
+  .chat-name { font-weight:600; color:#fff; font-size:0.9rem; }
+  .chat-status { font-size:0.7rem; color:#4ade80; }
+  .msg { display:flex; gap:0.5rem; margin-bottom:0.7rem; }
+  .msg.user { flex-direction:row-reverse; }
+  .bubble {
+    padding:0.65rem 0.9rem; border-radius:14px;
+    font-size:0.83rem; line-height:1.5; max-width:82%;
+  }
+  .msg.bud .bubble {
+    background:rgba(255,255,255,0.07);
+    border:1px solid rgba(255,255,255,0.08);
+    color:rgba(255,255,255,0.8);
+    border-radius:4px 14px 14px 14px;
+  }
+  .msg.user .bubble {
+    background:rgba(245,166,35,0.14);
+    border:1px solid rgba(245,166,35,0.22);
+    color:rgba(255,255,255,0.85);
+    border-radius:14px 4px 14px 14px;
+  }
+  .bubble strong { color:var(--sun); }
+
+  /* BUTTONS */
+  .cta-row { display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap; }
+  .btn {
+    padding:0.9rem 2rem; border-radius:50px;
+    font-size:0.9rem; font-weight:500; cursor:pointer;
+    border:none; text-decoration:none; display:inline-block;
+    transition:all 0.2s;
+  }
+  .btn-primary { background:var(--sun); color:var(--deep); }
+  .btn-primary:hover { background:#f7b84a; transform:translateY(-2px); box-shadow:0 8px 25px rgba(245,166,35,0.3); }
+  .btn-ghost {
+    background:transparent; color:rgba(255,255,255,0.55);
+    border:1px solid rgba(255,255,255,0.15);
+  }
+  .btn-ghost:hover { border-color:rgba(255,255,255,0.35); color:#fff; }
+
+  /* SCROLL STRIP */
+  .strip {
+    background:var(--sun); padding:0.9rem;
+    overflow:hidden;
+  }
+  .strip-inner {
+    display:flex; gap:3rem;
+    animation:scroll 18s linear infinite;
+    white-space:nowrap;
+  }
+  @keyframes scroll {
+    from { transform:translateX(0); }
+    to { transform:translateX(-50%); }
+  }
+  .strip-item { font-style:italic; color:var(--deep); opacity:0.7; flex-shrink:0; font-size:0.95rem; }
+
+  /* SECTIONS */
+  .section { padding:5rem 1.5rem; max-width:1000px; margin:0 auto; }
+  .label { font-size:0.72rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--sky); margin-bottom:0.8rem; font-weight:500; }
+  h2 { font-size:clamp(1.8rem,4vw,3rem); font-weight:300; line-height:1.2; letter-spacing:-0.02em; margin-bottom:1.2rem; }
+  h2 em { font-style:italic; color:var(--coral); }
+
+  /* CARDS */
+  .cards { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-top:2.5rem; }
+  @media(max-width:600px){ .cards { grid-template-columns:1fr; } }
+  .card {
+    background:var(--sand); border-radius:18px; padding:1.8rem;
+    border:1px solid rgba(0,0,0,0.05);
+    transition:transform 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { transform:translateY(-4px); box-shadow:0 12px 35px rgba(0,0,0,0.08); }
+  .card.dark { background:var(--deep); color:#fff; grid-column:span 2; }
+  @media(max-width:600px){ .card.dark { grid-column:span 1; } }
+  .card-icon { font-size:1.8rem; margin-bottom:0.8rem; }
+  .card h3 { font-size:1.1rem; font-weight:600; margin-bottom:0.5rem; }
+  .card.dark h3 { color:var(--sun); }
+  .card p { font-size:0.85rem; line-height:1.7; color:rgba(0,0,0,0.55); }
+  .card.dark p { color:rgba(255,255,255,0.55); }
+  .vs { display:inline-block; background:rgba(232,99,74,0.1); color:var(--coral); border:1px solid rgba(232,99,74,0.2); padding:0.15rem 0.5rem; border-radius:5px; font-size:0.72rem; font-weight:500; margin-bottom:0.4rem; }
+
+  /* DREAM SECTION */
+  .dream { background:var(--deep); padding:5rem 1.5rem; }
+  .dream-inner { max-width:1000px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; }
+  @media(max-width:700px){ .dream-inner { grid-template-columns:1fr; } }
+  .dream .label { color:var(--sun); }
+  .dream h2 { color:#fff; }
+  .dream h2 em { color:var(--sun); }
+  .dream p { color:rgba(255,255,255,0.5); line-height:1.8; margin-bottom:1.8rem; }
+  .dream-widget {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:20px; padding:1.5rem;
+  }
+  .dream-widget h4 { color:#fff; font-weight:500; margin-bottom:1.2rem; font-size:0.95rem; }
+  .dfield {
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; padding:0.75rem 1rem;
+    display:flex; justify-content:space-between;
+    margin-bottom:0.6rem; font-size:0.83rem;
+  }
+  .dfield span:first-child { color:rgba(255,255,255,0.4); text-transform:uppercase; font-size:0.7rem; letter-spacing:0.05em; }
+  .dfield span:last-child { color:#fff; }
+  .dfield span.hi { color:var(--sun); }
+  .dalert {
+    background:rgba(74,222,128,0.08);
+    border:1px solid rgba(74,222,128,0.2);
+    border-radius:10px; padding:0.9rem;
+    margin-top:0.8rem; display:flex; gap:0.7rem; align-items:flex-start;
+  }
+  .dalert p { font-size:0.8rem; color:rgba(255,255,255,0.65); line-height:1.5; }
+  .dalert strong { color:#4ade80; }
+
+  /* STEPS */
+  .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2.5rem; }
+  @media(max-width:600px){ .steps { grid-template-columns:1fr; } }
+  .step { text-align:center; padding:1.5rem 1rem; }
+  .step-num {
+    width:48px; height:48px; background:var(--deep); color:var(--sun);
+    border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:1.2rem; font-weight:700; margin:0 auto 1rem;
+  }
+  .step h3 { font-size:1rem; font-weight:600; margin-bottom:0.5rem; }
+  .step p { font-size:0.83rem; color:rgba(0,0,0,0.5); line-height:1.65; }
+
+  /* QUOTE */
+  .quote-section { background:#F9EFE0; padding:4rem 1.5rem; text-align:center; }
+  blockquote {
+    font-size:clamp(1.3rem,3vw,1.9rem); font-weight:300;
+    font-style:italic; line-height:1.5; color:var(--deep);
+    max-width:620px; margin:0 auto 1rem;
+  }
+  blockquote em { font-style:normal; color:var(--coral); }
+  cite { font-size:0.82rem; color:rgba(0,0,0,0.4); font-style:normal; }
+
+  /* FINAL CTA */
+  .final {
+    background:var(--deep); padding:5rem 1.5rem;
+    text-align:center; position:relative; overflow:hidden;
+  }
+  .final::before {
+    content:''; position:absolute; inset:0;
+    background:radial-gradient(ellipse 60% 60% at 50% 100%, rgba(245,166,35,0.1) 0%, transparent 60%);
+  }
+  .final h2 { color:#fff; position:relative; z-index:1; }
+  .final h2 em { color:var(--sun); }
+  .final p { color:rgba(255,255,255,0.4); margin-bottom:2rem; position:relative; z-index:1; }
+  .final .cta-row { position:relative; z-index:1; }
+
+  /* FOOTER */
+  footer { background:#060f14; padding:1.5rem; text-align:center; font-size:0.78rem; color:rgba(255,255,255,0.2); }
+  footer span { color:var(--sun); }
+
+  /* MODAL */
+  .overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,0.65); z-index:200;
+    align-items:center; justify-content:center; padding:1rem;
+    backdrop-filter:blur(4px);
+  }
+  .overlay.open { display:flex; }
+  .modal {
+    background:#fff; border-radius:22px; padding:2.2rem;
+    max-width:420px; width:100%; position:relative;
+    animation:mIn 0.3s ease;
+  }
+  @keyframes mIn { from{opacity:0;transform:scale(0.94) translateY(16px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .modal h3 { font-size:1.5rem; font-weight:400; margin-bottom:0.4rem; }
+  .modal p { color:rgba(0,0,0,0.45); font-size:0.87rem; margin-bottom:1.2rem; line-height:1.6; }
+  .modal input {
+    width:100%; border:1.5px solid rgba(0,0,0,0.12); border-radius:10px;
+    padding:0.8rem 1rem; font-size:0.9rem; margin-bottom:0.7rem;
+    outline:none; font-family:inherit; transition:border-color 0.2s;
+  }
+  .modal input:focus { border-color:var(--sky); }
+  .modal .btn-primary { width:100%; text-align:center; font-family:inherit; }
+  .close-btn {
+    position:absolute; top:1rem; right:1rem;
+    background:none; border:none; font-size:1.2rem; cursor:pointer; color:rgba(0,0,0,0.3);
+  }
+  .success { display:none; text-align:center; padding:1rem 0; }
+  .success .big { font-size:2.8rem; margin-bottom:0.8rem; }
+  .success h4 { font-size:1.3rem; font-weight:500; margin-bottom:0.4rem; }
+  .success p { color:rgba(0,0,0,0.45); font-size:0.87rem; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">TripBuddy<span>AI</span></div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="eyebrow">✦ Votre compagnon voyage intelligent</div>
+    <h1>Voyager en famille,<br><em>enfin possible.</em></h1>
+    <p class="hero-sub">Dites à Bud où vous rêvez d'aller, votre budget, vos dates — il trouve, compare et propose. Sans jargon, sans vente. Juste la vérité.</p>
+
+    <div class="chat-demo">
+      <div class="chat-header">
+        <div class="avatar-circle">🌍</div>
+        <div>
+          <div class="chat-name">Bud</div>
+          <div class="chat-status">● En ligne</div>
+        </div>
+      </div>
+      <div class="msg user">
+        <div class="bubble">Disneyland Paris weekend moins cher possible, départ Lyon, famille de 4</div>
+      </div>
+      <div class="msg bud">
+        <div class="avatar-circle" style="width:28px;height:28px;font-size:0.8rem;flex-shrink:0">🌍</div>
+        <div class="bubble"><strong>Weekend 14-16 mars — 487€ tout compris</strong><br>🚂 Train 89€ · 🏨 Hôtel 196€ · 🎡 Billets 201€<br>🌤️ 11°C, ciel dégagé — parfait<br>💡 Arriver avant 9h, manger hors parc (-40%)</div>
+      </div>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn btn-primary" onclick="openModal()">Essayer Bud gratuitement</button>
+      <a href="#dream" class="btn btn-ghost">Voir Dream & Wait →</a>
+    </div>
+  </div>
+</section>
+
+<div class="strip">
+  <div class="strip-inner">
+    <span class="strip-item">« C'est possible alors »</span>
+    <span class="strip-item">« On part cet été »</span>
+    <span class="strip-item">« Enfin une vraie réponse »</span>
+    <span class="strip-item">« Pas de blabla, que des prix »</span>
+    <span class="strip-item">« Mon budget respecté »</span>
+    <span class="strip-item">« Les enfants vont adorer »</span>
+    <span class="strip-item">« C'est possible alors »</span>
+    <span class="strip-item">« On part cet été »</span>
+    <span class="strip-item">« Enfin une vraie réponse »</span>
+    <span class="strip-item">« Pas de blabla, que des prix »</span>
+    <span class="strip-item">« Mon budget respecté »</span>
+    <span class="strip-item">« Les enfants vont adorer »</span>
+  </div>
+</div>
+
+<section class="section">
+  <div class="label">Pourquoi TripBuddyAI</div>
+  <h2>Bud ne vend pas.<br><em>Bud répond.</em></h2>
+  <div class="cards">
+    <div class="card dark">
+      <div class="card-icon">💬</div>
+      <div class="vs">Vs Layla, Booking, Kayak</div>
+      <h3>Une question précise = une réponse précise</h3>
+      <p>Vous demandez le moins cher, on vous donne le moins cher. Pas le plus beau temps, pas la meilleure saison. Votre demande, respectée à la lettre. Si vous êtes vague, Bud pose juste la bonne question — rien de plus.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">✈️</div>
+      <h3>Tout comparé en un instant</h3>
+      <p>Train, voiture, avion, hôtel, billets, activités, météo — Bud agrège tout et présente la vraie addition finale. Pas un prix d'appel trompeur.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">👨‍👩‍👧‍👦</div>
+      <h3>Fait pour les familles</h3>
+      <p>Tarifs enfants, réductions familles, logements adaptés aux bébés — Bud pense famille par défaut, pas en option payante.</p>
+    </div>
+  </div>
+</section>
+
+<div class="dream" id="dream">
+  <div class="dream-inner">
+    <div>
+      <div class="label">Dream & Wait</div>
+      <h2>Votre rêve,<br><em>on le surveille.</em></h2>
+      <p>Vous ne pouvez pas partir maintenant ? Pas de problème. Dites à Bud votre destination de rêve, votre budget et votre fenêtre idéale. Il surveille les prix en silence. Quand c'est le bon moment, vous recevez une alerte.</p>
+      <button class="btn btn-primary" onclick="openModal()">Déposer mon rêve de voyage</button>
+    </div>
+    <div class="dream-widget">
+      <h4>🌙 Mon rêve en cours de surveillance…</h4>
+      <div class="dfield"><span>Destination</span><span>🏝️ Malte</span></div>
+      <div class="dfield"><span>Départ</span><span>Lyon (LYS)</span></div>
+      <div class="dfield"><span>Budget max</span><span class="hi">800€ (famille 4)</span></div>
+      <div class="dfield"><span>Fenêtre</span><span>Juillet – Août</span></div>
+      <div class="dalert">
+        <span>🎉</span>
+        <p><strong>Alerte Bud !</strong> Vol + hôtel trouvé — <strong>763€ pour 4 personnes</strong>, du 12 au 19 juillet.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="quote-section">
+  <blockquote>
+    "On avait arrêté de regarder les sites de voyage.<br>Trop de promesses, trop de déceptions.<br>Avec Bud, pour la première fois, <em>on a réservé.</em>"
+  </blockquote>
+  <cite>— Sophie, maman de 3 enfants, Clermont-Ferrand</cite>
+</section>
+
+<section class="section">
+  <div class="label">Comment ça marche</div>
+  <h2>Simple comme<br><em>parler à un ami.</em></h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Vous parlez à Bud</h3>
+      <p>Dites-lui destination, budget, dates, famille. En langage naturel — pas de formulaire compliqué.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Bud compare tout</h3>
+      <p>En quelques secondes, vols, trains, hébergements et activités. La vraie meilleure option pour vous.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Vous réservez</h3>
+      <p>Un lien direct, un prix final clair. Vous décidez librement. Bud ne touche pas de commission sur votre choix.</p>
+    </div>
+  </div>
+</section>
+
+<section class="final">
+  <h2>Votre prochain voyage<br><em>existe déjà.</em></h2>
+  <p>Bud va le trouver pour vous.</p>
+  <div class="cta-row">
+    <button class="btn btn-primary" onclick="openModal()">Rejoindre la liste d'attente</button>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 TripBuddyAI — <span>"Parce que voyager ne devrait pas être un luxe."</span></p>
+</footer>
+
+<!-- MODAL -->
+<div class="overlay" id="modal">
+  <div class="modal">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <div id="mform">
+      <h3>Rejoindre la liste 🌍</h3>
+      <p>Soyez parmi les premiers à voyager avec Bud. On vous prévient dès l'ouverture.</p>
+      <input type="text" placeholder="Votre prénom" id="mname">
+      <input type="email" placeholder="votre@email.com" id="memail">
+      <button class="btn btn-primary" onclick="submit()">C'est parti ✦</button>
+    </div>
+    <div class="success" id="msuccess">
+      <div class="big">🎉</div>
+      <h4>Vous êtes sur la liste !</h4>
+      <p>Bud vous contacte dès l'ouverture.<br>En attendant, rêvez grand.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal(){ document.getElementById('modal').classList.add('open'); }
+  function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+  function submit(){
+    if(!document.getElementById('memail').value) return;
+    document.getElementById('mform').style.display='none';
+    document.getElementById('msuccess').style.display='block';
+  }
+  document.getElementById('modal').addEventListener('click',function(e){ if(e.target===this) closeModal(); });
+</script>
+</body>
+</html>
